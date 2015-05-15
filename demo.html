@@ -3,14 +3,60 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Document</title>
+
+	<style type="text/css">
+		body,div,ul,ol,li {
+			margin: 0;
+			padding: 0;
+		}
+
+		li {
+			list-style: none;
+		}
+
+		#myFade {
+			width: 1050px;
+			height: 700px;
+		}
+
+		#fadeDots {
+			position: absolute;
+			left: 50%;
+			bottom: 10px;
+			z-index: 3;
+			overflow: hidden;
+		}
+		#fadeDots li {
+			float: left;
+			width: 10px;
+			height: 10px;
+			margin: 0 3px;
+			text-indent: 999em;
+			border: 1px solid #fff;
+			border-radius: 50%;
+			cursor: pointer;
+		}
+		#fadeDots li.active,
+		#fadeDots li:hover {
+			background-color: #fff;
+		}
+	</style>
 </head>
 <body>
 	<div id="myFade">
 		<ul>
-			<li><img src=""></li>
-			<li></li>
-			<li></li>
+			<li><img src="images/pic1.jpg"></li>
+			<li><img src="images/pic2.jpg"></li>
+			<li><img src="images/pic3.jpg"></li>
 		</ul>
 	</div>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/fade.js"></script>
 </body>
 </html>
+
+<script type="text/javascript">
+	new Fade("#myFade",{dots:false,delay:2000,speed:2000,autoplay:true});
+	//$("#myFade").fade({dots:true,delay:2000,speed:2000});
+</script>

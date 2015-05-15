@@ -1,13 +1,13 @@
 (function($) {
 	var Fade = function(element, options) {
 		this.defOptions = $.extend({}, this.defOptions, options);
-		this.init(element);
+		this.init($(element));
 	};
 
 	Fade.prototype = {
 
 		defOptions: {
-			speed : 500,
+			speed : 1000,
 			delay : 5000,
 			dots : true,
 			autoplay : true,
@@ -15,7 +15,7 @@
 			item : ">li"
 		},
 
-		defStatus: {
+		_defStatus: {
 			index: 0,
 			lastIndex: 0,
 			len: 0,
@@ -29,38 +29,81 @@
 				elWidth = element.width(),
 				elHeight = element.height();
 
-			this.defStatus.len = li.length,
+			this._defStatus.len = li.length;
 
 			element.css("position", "relative");
 			li.css({"position":"absolute", "display":"none"});
 			li.first().css("display", "block");
 			li.width(elWidth);
 			li.height(elHeight);
-			//debugger
-			// dots && createDots();
-			this.defOptions.autoplay && setTimeout(this.goFade(that, li),this.defOptions.delay);
+
+			this.defOptions.dots && this.createDots(element, li);
+
+			this.defOptions.autoplay && setTimeout(function() {
+					that.goFade(li);
+				}, this.defOptions.delay);
 		},
 
-		goFade: function(that, item) {
-			var index = that.defStatus.index,
-				len = that.defStatus.len,
-				lastIndex = that.defStatus.lastIndex,
-				speed = that.defOptions.speed;
-			if (index < len) {
-				index ++;
-			} else {
+		fading: function(item) {
+			var index = this._defStatus.index,
+				len = this._defStatus.len-1,
+				lastIndex = this._defStatus.lastIndex,
+				speed = this.defOptions.speed;
+			if (index == len) {
 				index = 0;
+			} else {
+				index ++;
 			}
 
-			item.eq(index).css("z-index", 2);
-			item.eq(lastIndex).css("z-index", 1).fadeOut(speed, function() {
-				item.eq(index).fadeIn(speed);
+			item.eq(index).css("z-index", 1).show();
+			item.eq(lastIndex).css("z-index", 2).fadeOut(speed);
+
+			this.defOptions.dots && $("#fadeDots>li").removeClass("active").eq(index).addClass("active");
+
+			this._defStatus.index = index;
+			this._defStatus.lastIndex = index;
+		},
+
+		goFade: function(item) {
+			var that = this;
+			that.fading(item);			
+
+			setTimeout(function() {
+				that.goFade(item);
+			}, this.defOptions.delay);
+		},
+
+		createDots: function(el, item) {
+			var that = this,
+				index = this._defStatus.index,
+				len = this._defStatus.len,
+				html = "<ol id='fadeDots'>";
+
+			for (var i = 1; i < len+1; i++) {
+				if (i == index+1) {
+					html += "<li class='active'>"+ i +"</li>";
+				} else {
+					html += "<li>"+ i +"</li>";
+				}
+			};
+			html += "</ol>";
+
+			el.append(html);
+
+			var magin = (-$("#fadeDots").width()/2) + "px";
+			$("#fadeDots").css("margin-left",magin);
+
+			$("#fadeDots>li").click(function() {
+				if (!$(this).hasClass("active")) {
+					that._defStatus.index = $(this).index() - 1;
+					that.fading(item);
+				};
 			});
-
-			that.defStatus.lastIndex = index;
-
-			setTimeout(arguments.callee(that, item), that.defOptions.delay);	
 		}
+	};
+
+	$.fn.fade = function(options) {
+		new Fade(this, options);
 	};
 
 	window.Fade = Fade || {};
