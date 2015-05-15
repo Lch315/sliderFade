@@ -24,12 +24,12 @@
 
 		init: function(element) {
 			var that = this,
-				ul = element.find(this.defOptions.items),
-				li = ul.find(this.defOptions.item),
+				ul = element.find(that.defOptions.items),
+				li = ul.find(that.defOptions.item),
 				elWidth = element.width(),
 				elHeight = element.height();
 
-			this._defStatus.len = li.length;
+			that._defStatus.len = li.length;
 
 			element.css("position", "relative");
 			li.css({"position":"absolute", "display":"none"});
@@ -37,11 +37,11 @@
 			li.width(elWidth);
 			li.height(elHeight);
 
-			this.defOptions.dots && this.createDots(element, li);
+			that.defOptions.dots && that.createDots(element, li);
 
-			this.defOptions.autoplay && setTimeout(function() {
+			that.defOptions.autoplay && setTimeout(function() {
 					that.goFade(li);
-				}, this.defOptions.delay);
+				}, that.defOptions.delay);
 		},
 
 		fading: function(item) {
@@ -70,13 +70,13 @@
 
 			setTimeout(function() {
 				that.goFade(item);
-			}, this.defOptions.delay);
+			}, that.defOptions.delay);
 		},
 
 		createDots: function(el, item) {
 			var that = this,
-				index = this._defStatus.index,
-				len = this._defStatus.len,
+				index = that._defStatus.index,
+				len = that._defStatus.len,
 				html = "<ol id='fadeDots'>";
 
 			for (var i = 1; i < len+1; i++) {
