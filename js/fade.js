@@ -15,11 +15,12 @@
 			item : ">li"
 		},
 
-		_defStatus: {
+		_status: {
 			index: 0,
 			lastIndex: 0,
 			len: 0,
-			timer: null
+			timer: null,
+			complete: true
 		},
 
 		init: function(element) {
@@ -29,7 +30,7 @@
 				elWidth = element.width(),
 				elHeight = element.height();
 
-			that._defStatus.len = li.length;
+			that._status.len = li.length;
 
 			element.css("position", "relative");
 			li.css({"position":"absolute", "display":"none"});
@@ -39,44 +40,63 @@
 
 			that.defOptions.dots && that.createDots(element, li);
 
-			that.defOptions.autoplay && setTimeout(function() {
-					that.goFade(li);
+			// that.defOptions.autoplay && setTimeout(function() {
+			// 		that.goFade(li);
+			// 	}, that.defOptions.delay);
+
+			if (that.defOptions.autoplay) {
+				that._status.timer = setInterval(function() {
+					that.fading(li);
 				}, that.defOptions.delay);
+			};
 		},
 
 		fading: function(item) {
-			var index = this._defStatus.index,
-				len = this._defStatus.len-1,
-				lastIndex = this._defStatus.lastIndex,
-				speed = this.defOptions.speed;
+			var that = this,
+				index = that._status.index,
+				len = that._status.len-1,
+				lastIndex = that._status.lastIndex,
+				speed = that.defOptions.speed;
+
+			that._status.complete = false;
+
 			if (index == len) {
 				index = 0;
 			} else {
 				index ++;
-			}
+			};
 
 			item.eq(index).css("z-index", 1).show();
-			item.eq(lastIndex).css("z-index", 2).fadeOut(speed);
+			item.eq(lastIndex).css("z-index", 2).fadeOut(speed, function() {
+				that._status.complete = true;
+			});
 
-			this.defOptions.dots && $("#fadeDots>li").removeClass("active").eq(index).addClass("active");
+			that.defOptions.dots && $("#fadeDots>li").removeClass("active").eq(index).addClass("active");
 
-			this._defStatus.index = index;
-			this._defStatus.lastIndex = index;
+			that._status.index = index;
+			that._status.lastIndex = index;
+
+			if (that._status.timer) {
+				that._status.timer = clearInterval(that._status.timer);
+				that._status.timer = setInterval(function() {
+					that.fading(item);
+				}, that.defOptions.delay);
+			};
 		},
 
-		goFade: function(item) {
-			var that = this;
-			that.fading(item);			
+		// goFade: function(item) {
+		// 	var that = this;
+		// 	that.fading(item);			
 
-			setTimeout(function() {
-				that.goFade(item);
-			}, that.defOptions.delay);
-		},
+		// 	setTimeout(function() {
+		// 		that.goFade(item);
+		// 	}, that.defOptions.delay);
+		// },
 
 		createDots: function(el, item) {
 			var that = this,
-				index = that._defStatus.index,
-				len = that._defStatus.len,
+				index = that._status.index,
+				len = that._status.len,
 				html = "<ol id='fadeDots'>";
 
 			for (var i = 1; i < len+1; i++) {
@@ -94,8 +114,8 @@
 			$("#fadeDots").css("margin-left",magin);
 
 			$("#fadeDots>li").click(function() {
-				if (!$(this).hasClass("active")) {
-					that._defStatus.index = $(this).index() - 1;
+				if (that._status.complete && !$(this).hasClass("active")) {
+					that._status.index = $(this).index() - 1;
 					that.fading(item);
 				};
 			});
