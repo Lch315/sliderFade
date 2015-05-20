@@ -21,88 +21,184 @@
 		},
 
 		_status: {
-			type: null,
-			start: 0,
+			len: 0,
+			index: 0,
+			one: 0,
+			first: 0,
+			last: 0,
 			end: 0,
 			step: 0,
-			slen: 0,
-			index: 0,
-			to: true,
+			to: 0,
+			auto: true,
+			pos: true,
 			complete: true,
 			timer: null
 		},
 
 		init: function(element) {
-			var wh, that = this,
+			var wh, slen, that = this,
 				_o = that.defOptions,
 				_s = that._status,
 				ul = element.find(_o.items),
 				li = ul.find(_o.item),
 				elWidth = element.width(),
-				elHeight = element.height(),
-				type = _o.type;
+				elHeight = element.height();
 
-			if (!(type == "left" || type == "top")) {
-				alert('type: "left" or "top"');
+			if (!(_o.type == "left" || _o.type == "top")) {
+				alert('just support type: "left" or "top"');
+				return false;
+			};
+			if(_o.dots && _o.visible != 1) {
+				alert("visible: 1");
+				return false;
+			}
+
+			wh = _o.type == "left" ? elWidth : elHeight;
+
+			_s.len = li.length;
+
+			if (_s.len <= _o.visible) {
+				alert("error!");
 				return false;
 			};
 
-			len = li.length;
-			type == "left" ? wh = elWidth : elHeight;
-			
-			_s.type = type;	
-			_s.step = wh * _o.step / _o.visible;
-			_s.start = -wh;
-			_s.end = wh * (len + _o.visible) / _o.visible;
-			_s.slen = wh * (len + _o.visible * 2) / _o.visible;
+			_s.one = wh / _o.visible;
+			_s.first = _s.to = -wh;
+			_s.step = _s.one * _o.step;
+			_s.last = -(_s.one * _s.len);
+			_s.end = -(_s.one * (_s.len + _o.visible));
 
-			console.log(_s.start);
+			slen = _s.one * (_s.len + _o.visible * 2);
 
-			ul.css({"position": "absolute",  "overflow":"hidden", type: _s.slen + "px"}).css( _o.type, _s.start + "px");
-			li.css("float", type == "left" ? "left" : "none");
-			ul.prepend(li.slice(len - _o.visible).clone()).append(li.slice(0, _o.visible).clone()); 
+			//console.log(_s.first);
+
+			element.css({"position": "relative", "overflow": "hidden"});
+			ul.css({"position": "absolute",  "overflow":"hidden"}).css(_o.type == "left" ? "width" : "height", slen + "px").css( _o.type, _s.first + "px");
+			li.css("float", _o.type == "left" ? "left" : "none");
+			ul.prepend(li.slice(_s.len - _o.visible).clone()).append(li.slice(0, _o.visible).clone());
+
+			_o.prev && that.goPrev(ul);
+			_o.next && that.goNext(ul);
+
+			_o.dots && that.createDots(element, ul);
 
 			if (_o.autoplay) {
 				_s.timer = setInterval(function() {
 					that.goSlide(ul);
 				}, _o.delay);
 			};
-
-
-			//console.log(that._status.len);
 		},
 
 		goSlide: function(items) {
 			var that = this,
 				_o = that.defOptions,
-				_s = that._status,
-				type = _o.type;
-			
-			console.log(type);
+				_s = that._status;
 
 			_s.complete = false;
-			
-			debugger
-			if (_s.to) {
-				if (_s.index == _s.slen) {
-					items.css(_o.type, _s.start +"px");
-					_s.index = _s.start;
+
+			if (_s.auto) {
+				if (_s.pos) {
+					if (_s.to == _s.end) {
+						items.css(_o.type, _s.first +"px");
+						_s.to = _s.first;
+					};
+					_s.to -= _s.step;
+
+					if (_o.dots) {
+						if (_s.index == _s.len - 1) {
+							_s.index = 0;
+						} else {
+							_s.index ++;
+						};
+					};
+				} else {
+					if (_s.to == 0) {
+						items.css(_o.type, _s.last + "px");
+						_s.to = _s.last;
+					}
+					_s.to += _s.step;
+
+					if (_o.dots) {
+						if (_s.index == 0) {
+							_s.index = _s.len - 1;
+						} else {
+							_s.index --;
+						};
+					};
 				};
-				_s.index += _s.step;
 			} else {
-				if (_s.index == 0) {
-					items.css(_o.type, _s.end + "px");
-					_s.index = _s.end;
-				}
-				s.index -= _s.step;
+				_s.to = _s.first - _s.one * _s.index;
 			}
 
-			items.animate({type: _s.index + "px"}, _o.speed, function() {
+			items.animate(_o.type == "left" ? {left: _s.to + "px"} : {top: _s.to + "px"}, _o.speed, function() {
 				_s.complete = true;
+				_s.pos = true;
+				_s.auto = true;
 			});
-		}
+
+			_o.dots && $("#sliderDots>li").removeClass("active").eq(_s.index).addClass("active");
+
+			if (_s.timer) {
+				_s.timer = clearInterval(_s.timer);
+				_s.timer = setInterval(function() {
+					that.goSlide(items);
+				}, _o.delay);
+			};
+		},
+
+		goPrev: function(items) {
+			var that = this;
+
+			that.defOptions.prev.click(function() {
+				if (that._status.complete) {
+					that._status.pos = false;
+					that.goSlide(items);
+				};
+			});
+		},
+
+		goNext: function(items) {
+			var that = this;
+
+			that.defOptions.next.click(function() {
+				if (that._status.complete) {
+					that.goSlide(items);
+				};
+			});
+		},
+
+		createDots: function(el, items) {
+			var that = this,
+				_s = that._status,
+				html = "<ol id='sliderDots'>";
+
+			for (var i = 1; i < _s.len+1; i++) {
+				if (i == _s.index + 1) {
+					html += "<li class='active'>"+ i +"</li>";
+				} else {
+					html += "<li>"+ i +"</li>";
+				}
+			};
+			html += "</ol>";
+
+			el.append(html);
+
+			var magin = (-$("#sliderDots").width()/2) + "px";
+			$("#sliderDots").css("margin-left",magin);
+
+			$("#sliderDots>li").click(function() {
+				if (_s.complete && !$(this).hasClass("active")) {
+					_s.auto = false;
+					_s.index = $(this).index();
+					that.goSlide(items);
+				};
+			});
+		}	
 	};
 
+	$.fn.slider = function(options) {
+		new Slider(this, options);
+	};
 
 	window.Slider = Slider || {};
 

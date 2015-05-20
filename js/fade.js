@@ -25,12 +25,14 @@
 
 		init: function(element) {
 			var that = this,
-				ul = element.find(that.defOptions.items),
-				li = ul.find(that.defOptions.item),
+				_o = that.defOptions,
+				_s = that._status,
+				ul = element.find(_o.items),
+				li = ul.find(_o.item),
 				elWidth = element.width(),
 				elHeight = element.height();
 
-			that._status.len = li.length;
+			_s.len = li.length;
 
 			element.css("position", "relative");
 			li.css({"position":"absolute", "display":"none"});
@@ -38,69 +40,52 @@
 			li.width(elWidth);
 			li.height(elHeight);
 
-			that.defOptions.dots && that.createDots(element, li);
+			_o.dots && that.createDots(element, li);
 
-			// that.defOptions.autoplay && setTimeout(function() {
-			// 		that.goFade(li);
-			// 	}, that.defOptions.delay);
-
-			if (that.defOptions.autoplay) {
-				that._status.timer = setInterval(function() {
+			if (_o.autoplay) {
+				_s.timer = setInterval(function() {
 					that.fading(li);
-				}, that.defOptions.delay);
+				}, _o.delay);
 			};
 		},
 
 		fading: function(item) {
 			var that = this,
-				index = that._status.index,
-				len = that._status.len-1,
-				lastIndex = that._status.lastIndex,
-				speed = that.defOptions.speed;
+				_o = that.defOptions,
+				_s = that._status;
 
-			that._status.complete = false;
+			_s.complete = false;
 
-			if (index == len) {
-				index = 0;
+			if (_s.index == _s.len - 1) {
+				_s.index = 0;
 			} else {
-				index ++;
+				_s.index ++;
 			};
 
-			item.eq(index).css("z-index", 1).show();
-			item.eq(lastIndex).css("z-index", 2).fadeOut(speed, function() {
-				that._status.complete = true;
+			item.eq(_s.index).css("z-index", 1).show();
+			item.eq(_s.lastIndex).css("z-index", 2).fadeOut(_o.speed, function() {
+				_s.complete = true;
 			});
 
-			that.defOptions.dots && $("#fadeDots>li").removeClass("active").eq(index).addClass("active");
+			_o.dots && $("#fadeDots>li").removeClass("active").eq(_s.index).addClass("active");
 
-			that._status.index = index;
-			that._status.lastIndex = index;
+			_s.lastIndex = _s.index;
 
-			if (that._status.timer) {
-				that._status.timer = clearInterval(that._status.timer);
-				that._status.timer = setInterval(function() {
+			if (_s.timer) {
+				_s.timer = clearInterval(_s.timer);
+				_s.timer = setInterval(function() {
 					that.fading(item);
-				}, that.defOptions.delay);
+				}, _o.delay);
 			};
 		},
 
-		// goFade: function(item) {
-		// 	var that = this;
-		// 	that.fading(item);			
-
-		// 	setTimeout(function() {
-		// 		that.goFade(item);
-		// 	}, that.defOptions.delay);
-		// },
-
 		createDots: function(el, item) {
 			var that = this,
-				index = that._status.index,
-				len = that._status.len,
+				_s = that._status,
 				html = "<ol id='fadeDots'>";
 
-			for (var i = 1; i < len+1; i++) {
-				if (i == index+1) {
+			for (var i = 1; i < _s.len+1; i++) {
+				if (i == _s.index+1) {
 					html += "<li class='active'>"+ i +"</li>";
 				} else {
 					html += "<li>"+ i +"</li>";
@@ -114,8 +99,8 @@
 			$("#fadeDots").css("margin-left",magin);
 
 			$("#fadeDots>li").click(function() {
-				if (that._status.complete && !$(this).hasClass("active")) {
-					that._status.index = $(this).index() - 1;
+				if (_s.complete && !$(this).hasClass("active")) {
+					_s.index = $(this).index() - 1;
 					that.fading(item);
 				};
 			});

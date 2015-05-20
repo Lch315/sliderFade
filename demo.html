@@ -17,6 +17,15 @@
 		#myFade {
 			width: 1050px;
 			height: 700px;
+			margin: auto;
+		}
+		/*#myFade>ul>li {
+			width: 515px;
+			margin: 5px;
+			overflow: hidden;
+		}*/
+		#myFade li>img {
+			display: block;
 		}
 
 		#fadeDots {
@@ -40,6 +49,39 @@
 		#fadeDots li:hover {
 			background-color: #fff;
 		}
+
+		#sliderDots {
+			position: absolute;
+			right: 10px;
+			bottom: 10px;
+			z-index: 3;
+			overflow: hidden;
+		}
+		#sliderDots li {
+			float: left;
+			width: 24px;
+			height: 16px;
+			margin: 0 3px;
+			line-height: 16px;
+			text-align: center;
+			font-size: 14px;
+			color: #fff;
+			border: 1px solid #333;
+			background-color: rgba(0,0,0,.2);
+			cursor: pointer;
+		}
+		#sliderDots li.active,
+		#sliderDots li:hover {
+			color: #666;
+			background-color: #fff;
+		}
+
+		.arrow {
+			width: 20px;
+			height: 20px;
+			border: 1px solid #f30;
+			cursor: pointer;
+		}
 	</style>
 </head>
 <body>
@@ -53,15 +95,18 @@
 			<li><img src="images/pic3.jpg"></li>
 		</ul>
 	</div>
+	<div class="arrow" id="prev"></div>
+	<div class="arrow" id="next"></div>
 
 	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<!--script type="text/javascript" src="js/fade.js"></script-->
+	<script type="text/javascript" src="js/fade.js"></script>
 	<script type="text/javascript" src="js/slider.js"></script>
 </body>
 </html>
 
 <script type="text/javascript">
-	new Slider("#myFade");
 	//new Fade("#myFade",{dots:true,delay:5000,speed:800,autoplay:true});
 	//$("#myFade").fade({dots:true,delay:2000,speed:2000});
+	//new Slider("#myFade", {type: "top", prev: $("#prev"), next: $("#next"), autoplay: true, dots: true, visible: 1});
+	$("#myFade").slider({dots: true, prev: $("#prev"), next: $("#next")});
 </script>
