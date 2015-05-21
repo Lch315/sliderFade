@@ -7,7 +7,7 @@
 	Slider.prototype = {
 
 		defOptions: {
-			type : "left", //support "left, top"
+			type : true, // true: "left", false: "top"
 			visible: 1,
 			step: 1,
 			speed : 500,
@@ -44,23 +44,9 @@
 				elWidth = element.width(),
 				elHeight = element.height();
 
-			if (!(_o.type == "left" || _o.type == "top")) {
-				alert('just support type: "left" or "top"');
-				return false;
-			};
-			if(_o.dots && _o.visible != 1) {
-				alert("visible: 1");
-				return false;
-			}
-
-			wh = _o.type == "left" ? elWidth : elHeight;
+			wh = _o.type ? elWidth : elHeight;
 
 			_s.len = li.length;
-
-			if (_s.len <= _o.visible) {
-				alert("error!");
-				return false;
-			};
 
 			_s.one = wh / _o.visible;
 			_s.first = _s.to = -wh;
@@ -70,11 +56,9 @@
 
 			slen = _s.one * (_s.len + _o.visible * 2);
 
-			//console.log(_s.first);
-
 			element.css({"position": "relative", "overflow": "hidden"});
-			ul.css({"position": "absolute",  "overflow":"hidden"}).css(_o.type == "left" ? "width" : "height", slen + "px").css( _o.type, _s.first + "px");
-			li.css("float", _o.type == "left" ? "left" : "none");
+			ul.css({"position": "absolute",  "overflow":"hidden"}).css(_o.type ? "width" : "height", slen + "px").css(_o.type ? "left" : "top", _s.first + "px");
+			li.css("float", _o.type ? "left" : "none");
 			ul.prepend(li.slice(_s.len - _o.visible).clone()).append(li.slice(0, _o.visible).clone());
 
 			_o.prev && that.goPrev(ul);
@@ -98,10 +82,6 @@
 
 			if (_s.auto) {
 				if (_s.pos) {
-					if (_s.to == _s.end) {
-						items.css(_o.type, _s.first +"px");
-						_s.to = _s.first;
-					};
 					_s.to -= _s.step;
 
 					if (_o.dots) {
@@ -112,10 +92,6 @@
 						};
 					};
 				} else {
-					if (_s.to == 0) {
-						items.css(_o.type, _s.last + "px");
-						_s.to = _s.last;
-					}
 					_s.to += _s.step;
 
 					if (_o.dots) {
@@ -130,10 +106,20 @@
 				_s.to = _s.first - _s.one * _s.index;
 			}
 
-			items.animate(_o.type == "left" ? {left: _s.to + "px"} : {top: _s.to + "px"}, _o.speed, function() {
+			items.animate(_o.type ? {left: _s.to + "px"} : {top: _s.to + "px"}, _o.speed, function() {
 				_s.complete = true;
 				_s.pos = true;
 				_s.auto = true;
+
+				if (_s.to == _s.end) {
+					items.css(_o.type ? "left" : "top", _s.first +"px");
+					_s.to = _s.first;
+				};
+				
+				if (_s.to == 0) {
+					items.css(_o.type ? "left" : "top", _s.last + "px");
+					_s.to = _s.last;
+				};
 			});
 
 			_o.dots && $("#sliderDots>li").removeClass("active").eq(_s.index).addClass("active");
