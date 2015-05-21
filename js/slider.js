@@ -104,7 +104,7 @@
 				};
 			} else {
 				_s.to = _s.first - _s.one * _s.index;
-			}
+			};
 
 			items.animate(_o.type ? {left: _s.to + "px"} : {top: _s.to + "px"}, _o.speed, function() {
 				_s.complete = true;
