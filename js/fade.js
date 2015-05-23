@@ -1,27 +1,28 @@
 (function($) {
 	var Fade = function(element, options) {
-		this.defOptions = $.extend({}, this.defOptions, options);
-		this.init($(element));
-	};
 
-	Fade.prototype = {
-
-		defOptions: {
+		this.defOptions = {
 			speed : 1000,
 			delay : 5000,
 			dots : true,
 			autoplay : true,
 			items : ">ul",
 			item : ">li"
-		},
+		};
 
-		_status: {
+		this._status = {
 			index: 0,
 			lastIndex: 0,
 			len: 0,
 			timer: null,
 			complete: true
-		},
+		};
+		
+		this.defOptions = $.extend({}, this.defOptions, options);
+		this.init($(element));
+	};
+
+	Fade.prototype = {
 
 		init: function(element) {
 			var that = this,

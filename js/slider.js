@@ -1,12 +1,7 @@
 (function($) {
 	var Slider = function(element, option) {
-		this.defOptions = $.extend({}, this.defOptions, option);
-		this.init($(element));
-	};
 
-	Slider.prototype = {
-
-		defOptions: {
+		this.defOptions = {
 			type : true, // true: "left", false: "top"
 			visible: 1,
 			step: 1,
@@ -18,9 +13,9 @@
 			autoplay : true,
 			items : ">ul",
 			item : ">li"
-		},
+		};
 
-		_status: {
+		this._status = {
 			len: 0,
 			index: 0,
 			one: 0,
@@ -33,7 +28,13 @@
 			pos: true,
 			complete: true,
 			timer: null
-		},
+		};
+
+		this.defOptions = $.extend({}, this.defOptions, option);
+		this.init($(element));
+	};
+
+	Slider.prototype = {
 
 		init: function(element) {
 			var wh, slen, that = this,
